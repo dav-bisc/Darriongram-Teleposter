@@ -1,0 +1,70 @@
+/* Form.css */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url("../img/bck.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.main-form {
+  padding: 50px;
+  margin: 30px;
+  background-color: #77b2d4; /* Add a white background to the form */
+  border-radius: 8px; /* Optional: Add rounded corners for a nicer look */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+form {
+  width: 300px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.header {
+  background-color: aquamarine;
+  font-weight: 800;
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: black;
+}
+
+footer {
+  text-align: center;
+  background-color: aquamarine;
+  font-weight: 500;
+}

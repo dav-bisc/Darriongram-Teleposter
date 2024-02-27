@@ -16,10 +16,10 @@ services:
     image: node:latest
     working_dir: /app
     volumes:
-      - ./client/client/public:/app/public
-      - ./client/client/src:/app/src
-      - ./client/client/package.json:/app/package.json
-      - ./client/client/img:/app/img
+      - ./client/public:/app/public
+      - ./client/src:/app/src
+      - ./client/package.json:/app/package.json
+      - ./client/img:/app/img
     ports:
       - "3000:3000"
     restart: "unless-stopped"
