@@ -1,0 +1,26 @@
+version: '3'
+services:
+  serv:
+    image: node:latest
+    env_file:
+      - .env
+    working_dir: /app
+    
+    volumes:
+      - ./server:/app
+    ports:
+      - "5000:5000"
+    restart: "unless-stopped"
+    command: ["node", "index.js"]
+  cli:
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./client/client/public:/app/public
+      - ./client/client/src:/app/src
+      - ./client/client/package.json:/app/package.json
+      - ./client/client/img:/app/img
+    ports:
+      - "3000:3000"
+    restart: "unless-stopped"
+    command: bash -c "npm --verbose install  && npm start"
