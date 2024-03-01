@@ -1,0 +1,8 @@
+FROM node:latest
+
+WORKDIR /app
+ADD public /app/public
+ADD src /app/src
+ADD package.json /app/package.json
+ADD img /app/img
+ADD tailwind.config.js /app/tailwind.config.js

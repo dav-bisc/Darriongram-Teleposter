@@ -1,26 +1,37 @@
 version: '3'
 services:
   serv:
-    image: node:latest
+    build: ./server
     env_file:
       - .env
     working_dir: /app
-    
-    volumes:
-      - ./server:/app
     ports:
       - "5000:5000"
     restart: "unless-stopped"
+    develop:
+      watch:
+        - action: rebuild
+          path: ./server/index.js
+          target: /app/index.js
+        - action: rebuild
+          path: ./server/package.json
+          target: /app/package.json
     command: ["node", "index.js"]
   cli:
-    image: node:latest
-    working_dir: /app
-    volumes:
-      - ./client/public:/app/public
-      - ./client/src:/app/src
-      - ./client/package.json:/app/package.json
-      - ./client/img:/app/img
+    build: ./client
     ports:
       - "3000:3000"
     restart: "unless-stopped"
+    develop:
+      watch:
+        - action: sync
+          path: ./client/src
+          target: /app/src
+          ignore: 
+            - node_modules
+        - action: sync
+          path: ./client/tailwind.config.js
+          target: /app/tailwind.config.js
+        - action: rebuild
+          path: ./client/package.json
     command: bash -c "npm --verbose install  && npm start"
