@@ -1,4 +1,4 @@
-[![eng](https://img.shields.io/badge/lang-it-yellow.svg)](https://github.com/dav-bisc/Darriongram-Teleposter/blob/main/README.md)
+[![eng](https://img.shields.io/badge/lang-eng-red.svg)](https://github.com/dav-bisc/Darriongram-Teleposter/blob/main/README.md)
 
 # Darriongram-Teleposter
 Semplice app web per inviare più link di affiliazione Amazon tramite un bot Telegram.
