@@ -1,26 +1,26 @@
 [![eng](https://img.shields.io/badge/lang-it-yellow.svg)](https://github.com/dav-bisc/Darriongram-Teleposter/blob/main/README.md)
 
 # Darriongram-Teleposter
-Simple web app to post multiple Amazon affiliate links through a Telegram bot.
+Semplice app web per inviare più link di affiliazione Amazon tramite un bot Telegram.
 
-## Requirements
+## Requisiti
 
-- Docker installation (e.g. Docker Desktop).
+- Installazione di Docker (ad esempio Docker Desktop).
 
-## Configuration
+## Configurazione
 
-Write the following information in the .env file located inside the root directory:
+Scrivi le seguenti informazioni nel file .env situato nella directory principale:
 ```
-BOT_TOKEN=<Token provided by Botfather>
-CHAT_ID=<ID of the channel or chat where the bot is supposed to post>
-ACCESS_KEY=<Provided in Amazon's PA portal>
-SECRET_KEY=<Provided in Amazon's PA portal>
-PARTNER_TAG=<Amazon's PA chosen partner tag>
+BOT_TOKEN=<Token fornito da Botfather>
+CHAT_ID=<ID del canale o della chat dove il bot deve inviare>
+ACCESS_KEY=<Fornito nel portale PA di Amazon>
+SECRET_KEY=<Fornito nel portale PA di Amazon>
+PARTNER_TAG=<Tag partner scelto di Amazon PA>
 PARTNER_TYPE=Associates
-MARKETPLACE=<Your amazon market place, e.g. 'www.amazon.it'>
+MARKETPLACE=<Il tuo marketplace Amazon, ad es. 'www.amazon.it'>
 ```
 
-## Startup
+## Avvio
 
 ```sh
 docker-compose up
