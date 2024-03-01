@@ -1,4 +1,4 @@
-[![it](https://img.shields.io/badge/lang-it-yellow.svg)](https://github.com/dav-bisc/Darriongram-Teleposter/blob/main/README.it.md)
+[![eng](https://img.shields.io/badge/lang-it-yellow.svg)](https://github.com/dav-bisc/Darriongram-Teleposter/blob/main/README.md)
 
 # Darriongram-Teleposter
 Simple web app to post multiple Amazon affiliate links through a Telegram bot.
@@ -25,3 +25,5 @@ MARKETPLACE=<Your amazon market place, e.g. 'www.amazon.it'>
 ```sh
 docker-compose up
 ```
+
+
