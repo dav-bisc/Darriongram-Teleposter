@@ -16,7 +16,7 @@ services:
         - action: rebuild
           path: ./server/package.json
           target: /app/package.json
-    command: ["node", "index.js"]
+    command: bash -c "npm install && node index.js"
   cli:
     build: ./client
     ports:
