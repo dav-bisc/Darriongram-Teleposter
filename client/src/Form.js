@@ -78,6 +78,7 @@ const Form = () => {
             <button
               onClick={handlePaste1}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
+              type="button"
             >
               <FaRegPaste />
             </button>
@@ -105,6 +106,7 @@ const Form = () => {
             <button
               onClick={handlePaste2}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
+              type="button"
             >
               <FaRegPaste />
             </button>
@@ -131,6 +133,7 @@ const Form = () => {
             <button
               onClick={handlePaste3}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
+              type="button"
             >
               <FaRegPaste />
             </button>
