@@ -25,9 +25,15 @@ function extractASIN(link) {
   let regex = RegExp(
     "https://www.amazon.it/([\\w-]+/)?(dp|gp/product)/(\\w+/)?(\\w{10})",
   );
+  let regex2 = RegExp("\/(?:dp|gp\/product)\/([A-Z0-9]{10})(?:\/|$)",
+  );
   m = link.match(regex);
+  m2 = link.match(regex2);
   if (m) {
     return m[4];
+  }
+  if(m2) {
+    return m2[1];
   }
   return "";
 }
@@ -64,6 +70,15 @@ function checkProduct(prodData, prodNum) {
     };
   } else {
     return { result: true };
+  }
+}
+
+function shortenString(s, N) {
+  if(s.length>N) {
+    return s.substring(0,N)+"..."
+  }
+  else {
+    return s
   }
 }
 
@@ -146,6 +161,17 @@ app.post("/", (req, res) => {
       if (!checkProduct(data, 1).result) {
         throw new Error(checkProduct(data, 1).msg);
       } else {
+        if (req.body.link2==="") {
+          console.log("I am here!")
+          const img1 = extractImg(data, 1);
+          const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+          const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`
+          bot.sendPhoto(process.env.CHAT_ID, img1, {parse_mode: "Markdown", caption: `${caption}`})
+          .catch((error) => {
+            handleError(error, res);
+          });
+        return res.status(200).send({ msg: "ricevuto" });
+        }
         amazonPaapi
           .GetItems(commonParameters, requestParameters2)
           .then((data2) => {
@@ -156,6 +182,9 @@ app.post("/", (req, res) => {
                 const img1 = extractImg(data, 1);
                 const img2 = extractImg(data2, 2);
 
+                const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+                const title2 = shortenString(data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+
                 const imageURLs = [img1, img2];
 
                 const media = imageURLs.map((imageURL, index) => ({
@@ -164,7 +193,7 @@ app.post("/", (req, res) => {
                   caption:
                     index === 0
                       ? `
-                                    *${emoji.get("bomb")} ${data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**
+                                    *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**
                                 `
                       : undefined,
                   parse_mode: "Markdown",
@@ -186,6 +215,10 @@ app.post("/", (req, res) => {
                       const img2 = extractImg(data2, 2);
                       const img3 = extractImg(data3, 3);
 
+                      const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+                      const title2 = shortenString(data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+                      const title3 = shortenString(data3.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+
                       const imageURLs = [img1, img2, img3];
 
                       const media = imageURLs.map((imageURL, index) => ({
@@ -194,7 +227,7 @@ app.post("/", (req, res) => {
                         caption:
                           index === 0
                             ? `
-                                        *${emoji.get("bomb")} ${data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**\n\n  *${emoji.get("bomb")} ${data3.ItemsResult.Items[0].ItemInfo.Title.DisplayValue}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data3.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})**
+                                        *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**\n\n  *${emoji.get("bomb")} ${title3}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data3.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})**
                                     `
                             : undefined,
                         parse_mode: "Markdown",

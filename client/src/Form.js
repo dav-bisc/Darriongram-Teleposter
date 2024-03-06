@@ -24,10 +24,12 @@ const Form = () => {
   const handleLink3Change = (event) => {
     setLink3(event.target.value);
   };
-  const handlePaste1 = () => {
+  const handlePaste1 = (e) => {
+    
     navigator.clipboard.readText().then((copiedLink) => {
       setLink1(copiedLink);
     });
+    
   };
   const handlePaste2 = () => {
     navigator.clipboard.readText().then((copiedLink) => {
@@ -44,7 +46,8 @@ const Form = () => {
     event.preventDefault();
     setIsLoading(true);
     const formData = { link1, link2, link3 };
-    const endpoint = "http://127.0.0.1:5000/";
+    console.log(`IP ADDR: ${process.env.REACT_APP_LOCAL_IP_ADDR} `)
+    const endpoint = `http://${process.env.REACT_APP_LOCAL_IP_ADDR}:5000`;
 
     const response = await fetch(`${endpoint}`, {
       method: "POST",
@@ -77,6 +80,7 @@ const Form = () => {
           <div className="flex items-center">
             <button
               onClick={handlePaste1}
+              onTouchStart={handlePaste1}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
               type="button"
             >
@@ -105,6 +109,7 @@ const Form = () => {
           <div className="flex items-center">
             <button
               onClick={handlePaste2}
+              onTouchStart={handlePaste2}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
               type="button"
             >
@@ -118,7 +123,6 @@ const Form = () => {
               value={link2}
               maxLength={255}
               onChange={handleLink2Change}
-              required
               title="Link del secondo prodotto da postare"
               className="w-64 py-1 px-2 rounded border"
             />
@@ -132,6 +136,7 @@ const Form = () => {
           <div className="flex items-center">
             <button
               onClick={handlePaste3}
+              onTouchStart={handlePaste3}
               className="py-1 px-1 bg-blue-400 text-white rounded-sm mr-2"
               type="button"
             >
