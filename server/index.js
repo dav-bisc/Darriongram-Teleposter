@@ -3,6 +3,7 @@ const cors = require("cors");
 const TelegramBot = require("node-telegram-bot-api");
 const amazonPaapi = require("amazon-paapi");
 const emoji = require("node-emoji");
+const axios = require("axios");
 
 const commonParameters = {
   AccessKey: process.env.ACCESS_KEY,
@@ -17,23 +18,40 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  console.log(req.body);
   return res.send(`ricevuto get`);
 });
+
+async function expandAmazonLink(shortenedLink) {
+  try {
+    const response = await axios.get(shortenedLink);
+    const expandedLink = response.request.res.responseUrl;
+    return expandedLink;
+  } catch (error) {
+    console.error("Error expanding Amazon link:", error);
+    return error.msg;
+  }
+}
 
 function extractASIN(link) {
   let regex = RegExp(
     "https://www.amazon.it/([\\w-]+/)?(dp|gp/product)/(\\w+/)?(\\w{10})",
   );
-  let regex2 = RegExp("\/(?:dp|gp\/product)\/([A-Z0-9]{10})(?:\/|$)",
-  );
+  let regex2 = RegExp("/(?:dp|gp/product)/([A-Z0-9]{10})(?:/|$)");
+
+  let regex3 = RegExp("//(dp|product)/([A-Za-z0-9]+)/");
+
   m = link.match(regex);
   m2 = link.match(regex2);
-  if (m) {
+  m3 = link.match(regex3);
+
+  if (m && m !== null) {
     return m[4];
   }
-  if(m2) {
+  if (m2 && m2 !== null) {
     return m2[1];
+  }
+  if (m3 && m3 !== null) {
+    return m3[1];
   }
   return "";
 }
@@ -74,11 +92,29 @@ function checkProduct(prodData, prodNum) {
 }
 
 function shortenString(s, N) {
-  if(s.length>N) {
-    return s.substring(0,N)+"..."
+  if (s.length > N) {
+    return s.substring(0, N) + "...";
+  } else {
+    return s;
   }
-  else {
-    return s
+}
+
+function makePostMsg(postMsg, data) {
+  if (postMsg === "" || postMsg === null || typeof postMsg === "undefined") {
+    return `sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount}`;
+  } else {
+    if (postMsg[0].value === 1) {
+      return `, sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount}`;
+    } else if (postMsg[0].value === 2) {
+      const savingAmount =
+        data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.Amount;
+      const priceAmount =
+        data.ItemsResult.Items[0].Offers.Listings[0].Price.Amount;
+      const originalAmount = Number(priceAmount) + Number(savingAmount);
+      return `invece di ${originalAmount.toFixed(2)} € !`;
+    } else if (postMsg[0].value === 3) {
+      return " OFFERTISSIMA!";
+    }
   }
 }
 
@@ -90,29 +126,65 @@ const handleError = (error, res) => {
   res.status(500).send({ msg: error.message });
 };
 
-app.post("/", (req, res) => {
-  const asin1 = extractASIN(req.body.link1);
-  if (asin1 === "") {
-    return res.status(400).send({
-      msg: "Impossibile recuperare ASIN link1, usare un altro link.",
-    });
-  }
-  let asin2 = "";
-  if (req.body.link2 != "") {
-    asin2 = extractASIN(req.body.link2);
-    if (asin2 === "") {
+app.post("/", async (req, res) => {
+  let asin1 = "";
+  try {
+    const link1 =
+      req.body.link1.length < 32
+        ? await expandAmazonLink(req.body.link1)
+        : req.body.link1;
+    asin1 = extractASIN(link1);
+    if (asin1 === "") {
       return res.status(400).send({
-        msg: "Impossibile recuperare ASIN link2, usare un altro link.",
+        msg: "Impossibile recuperare ASIN link1, usare un altro link.",
       });
     }
+  } catch (e) {
+    return res
+      .status(400)
+      .send({ msg: "Errore nell'espansione del link abbreviato" });
   }
+
+
+  let asin2 = "";
+  if (req.body.link2 != "") {
+    try {
+      const link2 =
+        req.body.link2.length < 32
+          ? await expandAmazonLink(req.body.link2)
+          : req.body.link2;
+
+      asin2 = extractASIN(link2);
+      if (asin2 === "") {
+        return res.status(400).send({
+          msg: "Impossibile recuperare ASIN link2, usare un altro link.",
+        });
+      }
+    } catch (e) {
+      return res
+        .status(400)
+        .send({ msg: "Errore nell'espansione del link abbreviato" });
+    }
+  }
+
   let asin3 = "";
   if (req.body.link3 != "") {
-    asin3 = extractASIN(req.body.link3);
-    if (asin3 === "") {
-      return res.status(400).send({
-        msg: "Impossibile recuperare ASIN link3, usare un altro link.",
-      });
+    try {
+      const link3 =
+        req.body.link3.length < 32
+          ? await expandAmazonLink(req.body.link3)
+          : req.body.link3;
+
+      asin3 = extractASIN(link3);
+      if (asin3 === "") {
+        return res.status(400).send({
+          msg: "Impossibile recuperare ASIN link3, usare un altro link.",
+        });
+      }
+    } catch (e) {
+      return res
+        .status(400)
+        .send({ msg: "Errore nell'espansione del link abbreviato" });
     }
   }
 
@@ -161,16 +233,23 @@ app.post("/", (req, res) => {
       if (!checkProduct(data, 1).result) {
         throw new Error(checkProduct(data, 1).msg);
       } else {
-        if (req.body.link2==="") {
-          console.log("I am here!")
+        if (req.body.link2 === "") {
+          const postMsg = makePostMsg(req.body.postMsg1, data);
           const img1 = extractImg(data, 1);
-          const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
-          const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`
-          bot.sendPhoto(process.env.CHAT_ID, img1, {parse_mode: "Markdown", caption: `${caption}`})
-          .catch((error) => {
-            handleError(error, res);
-          });
-        return res.status(200).send({ msg: "ricevuto" });
+          const title1 = shortenString(
+            data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+            48,
+          );
+          const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+          bot
+            .sendPhoto(process.env.CHAT_ID, img1, {
+              parse_mode: "Markdown",
+              caption: `${caption}`,
+            })
+            .catch((error) => {
+              handleError(error, res);
+            });
+          return res.status(200).send({ msg: "ricevuto" });
         }
         amazonPaapi
           .GetItems(commonParameters, requestParameters2)
@@ -182,9 +261,17 @@ app.post("/", (req, res) => {
                 const img1 = extractImg(data, 1);
                 const img2 = extractImg(data2, 2);
 
-                const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
-                const title2 = shortenString(data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+                const title1 = shortenString(
+                  data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                  48,
+                );
+                const title2 = shortenString(
+                  data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                  48,
+                );
 
+                const postMsg = makePostMsg(req.body.postMsg1, data);
+                const postMsg2 = makePostMsg(req.body.postMsg2, data2);
                 const imageURLs = [img1, img2];
 
                 const media = imageURLs.map((imageURL, index) => ({
@@ -193,7 +280,7 @@ app.post("/", (req, res) => {
                   caption:
                     index === 0
                       ? `
-                                    *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**
+                                    *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**
                                 `
                       : undefined,
                   parse_mode: "Markdown",
@@ -215,9 +302,22 @@ app.post("/", (req, res) => {
                       const img2 = extractImg(data2, 2);
                       const img3 = extractImg(data3, 3);
 
-                      const title1 = shortenString(data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
-                      const title2 = shortenString(data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
-                      const title3 = shortenString(data3.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,48);
+                      const title1 = shortenString(
+                        data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                        48,
+                      );
+                      const title2 = shortenString(
+                        data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                        48,
+                      );
+                      const title3 = shortenString(
+                        data3.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                        48,
+                      );
+
+                      const postMsg = makePostMsg(req.body.postMsg1, data);
+                      const postMsg2 = makePostMsg(req.body.postMsg2, data2);
+                      const postMsg3 = makePostMsg(req.body.postMsg3, data3);
 
                       const imageURLs = [img1, img2, img3];
 
@@ -227,7 +327,7 @@ app.post("/", (req, res) => {
                         caption:
                           index === 0
                             ? `
-                                        *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* , sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data2.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**\n\n  *${emoji.get("bomb")} ${title3}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}*, sconto di ${data3.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount} ${emoji.get("rocket")}\n **[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})**
+                                        *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**\n\n  *${emoji.get("bomb")} ${title3}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg3} ${emoji.get("rocket")}\n **[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})**
                                     `
                             : undefined,
                         parse_mode: "Markdown",

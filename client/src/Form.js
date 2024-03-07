@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { FaRegPaste } from "react-icons/fa6";
+import Select from "react-dropdown-select";
 const override = {
   display: "block",
   margin: "0 auto",
@@ -13,8 +14,15 @@ const Form = () => {
   const [link1, setLink1] = useState("");
   const [link2, setLink2] = useState("");
   const [link3, setLink3] = useState("");
+  const [postMsg1, setPostMsg1] = useState("");
+  const [postMsg2, setPostMsg2] = useState("");
+  const [postMsg3, setPostMsg3] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const msgOptions = [
+    { value: 1, label: "Sconto di ..." },
+    { value: 2, label: "passa da ... a ..." },
+    { value: 3, label: "OFFERTISSIMA!" },
+  ];
   const handleLink1Change = (event) => {
     setLink1(event.target.value);
   };
@@ -25,11 +33,9 @@ const Form = () => {
     setLink3(event.target.value);
   };
   const handlePaste1 = (e) => {
-    
     navigator.clipboard.readText().then((copiedLink) => {
       setLink1(copiedLink);
     });
-    
   };
   const handlePaste2 = () => {
     navigator.clipboard.readText().then((copiedLink) => {
@@ -45,8 +51,7 @@ const Form = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    const formData = { link1, link2, link3 };
-    console.log(`IP ADDR: ${process.env.REACT_APP_LOCAL_IP_ADDR} `)
+    const formData = { link1, link2, link3, postMsg1, postMsg2, postMsg3 };
     const endpoint = `http://${process.env.REACT_APP_LOCAL_IP_ADDR}:5000`;
 
     const response = await fetch(`${endpoint}`, {
@@ -57,7 +62,6 @@ const Form = () => {
       body: JSON.stringify(formData),
     });
     const result = await response.json();
-    console.log(result.msg);
     setIsLoading(false);
 
     if (result.msg === "ricevuto") {
@@ -86,6 +90,7 @@ const Form = () => {
             >
               <FaRegPaste />
             </button>
+
             {/* Reduced padding to px-1 */}
             <input
               type="text"
@@ -98,10 +103,18 @@ const Form = () => {
               title="Link del primo prodotto da postare (foto grande)"
               className="w-64 py-1 px-2 rounded border"
             />
-            {}
           </div>
+          {}
         </div>
-
+        <label className="font-semibold">Stile messaggio 1</label>
+        <Select
+          className="font-semibold"
+          placeholder="Stile messaggio 1"
+          values={msgOptions}
+          options={msgOptions}
+          onChange={(val) => setPostMsg1(val)}
+        />
+        <div class="border-b border-gray-300 p-3 my-3"></div>
         <div className="form-group">
           <label htmlFor="link2" className="font-semibold">
             Secondo link
@@ -127,8 +140,17 @@ const Form = () => {
               className="w-64 py-1 px-2 rounded border"
             />
           </div>
-          {}
         </div>
+        <label className="font-semibold">Stile messaggio 2</label>
+        <Select
+          className="font-semibold"
+          placeholder="Stile messaggio 2"
+          values={msgOptions}
+          options={msgOptions}
+          onChange={(val) => setPostMsg2(val)}
+        />
+        <div class="border-b border-gray-300 p-3 my-3"></div>
+
         <div className="form-group">
           <label htmlFor="link3" className="font-semibold">
             Terzo link
@@ -156,9 +178,17 @@ const Form = () => {
             {}
           </div>
         </div>
+        <label className="font-semibold">Stile messaggio 3</label>
+        <Select
+          className="font-semibold"
+          placeholder="Stile messaggio 3"
+          values={msgOptions}
+          options={msgOptions}
+          onChange={(val) => setPostMsg3(val)}
+        />
         <div className="container mx-auto my-auto flex flex-col items-center justify-center">
           <button
-            className="rounded-full border-4 border-white border-solid font-bold w-48 py-2"
+            className="rounded-full border-4 border-white border-solid font-bold w-48 py-2 mt-3"
             type="submit"
           >
             Invia post
