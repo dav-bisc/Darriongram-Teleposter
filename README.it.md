@@ -18,6 +18,7 @@ SECRET_KEY=<Fornito nel portale PA di Amazon>
 PARTNER_TAG=<Tag partner scelto di Amazon PA>
 PARTNER_TYPE=Associates
 MARKETPLACE=<Il tuo marketplace Amazon, ad es. 'www.amazon.it'>
+REACT_APP_LOCAL_IP_ADDR=<indirizzo ip locale della macchina host>
 ```
 
 ## Avvio
