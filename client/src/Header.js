@@ -1,5 +1,6 @@
 import React from "react";
 import "./Header.css"; // Import CSS file for additional styles
+import packageJson from "../package.json";
 
 const Header = () => {
   return (
@@ -7,7 +8,7 @@ const Header = () => {
       <h1 className="text-3xl font-bold animated-gradient">
         Darriongram Teleposter
       </h1>
-      <h5 className="text-sm mt-3">Ver. 0.0.1 (beta)</h5>
+      <h5 className="text-sm mt-3">Ver. {packageJson.version}</h5>
     </header>
   );
 };

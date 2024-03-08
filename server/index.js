@@ -127,6 +127,7 @@ const handleError = (error, res) => {
 };
 
 app.post("/", async (req, res) => {
+  //console.log("LUGHEZZA TITOLO SCELTA: ", req.body.titleLength1);
   let asin1 = "";
   try {
     const link1 =
@@ -144,7 +145,6 @@ app.post("/", async (req, res) => {
       .status(400)
       .send({ msg: "Errore nell'espansione del link abbreviato" });
   }
-
 
   let asin2 = "";
   if (req.body.link2 != "") {
@@ -236,10 +236,13 @@ app.post("/", async (req, res) => {
         if (req.body.link2 === "") {
           const postMsg = makePostMsg(req.body.postMsg1, data);
           const img1 = extractImg(data, 1);
-          const title1 = shortenString(
-            data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-            48,
-          );
+          const title1 =
+            req.body.titleLength1 === "breve"
+              ? shortenString(
+                  data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                  48,
+                )
+              : data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue;
           const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
           bot
             .sendPhoto(process.env.CHAT_ID, img1, {
@@ -261,14 +264,20 @@ app.post("/", async (req, res) => {
                 const img1 = extractImg(data, 1);
                 const img2 = extractImg(data2, 2);
 
-                const title1 = shortenString(
-                  data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-                  48,
-                );
-                const title2 = shortenString(
-                  data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-                  48,
-                );
+                const title1 =
+                  req.body.titleLength1 === "breve"
+                    ? shortenString(
+                        data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                        48,
+                      )
+                    : data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue;
+                const title2 =
+                  req.body.titleLength2 === "breve"
+                    ? shortenString(
+                        data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
+                        48,
+                      )
+                    : data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue;
 
                 const postMsg = makePostMsg(req.body.postMsg1, data);
                 const postMsg2 = makePostMsg(req.body.postMsg2, data2);
@@ -302,18 +311,33 @@ app.post("/", async (req, res) => {
                       const img2 = extractImg(data2, 2);
                       const img3 = extractImg(data3, 3);
 
-                      const title1 = shortenString(
-                        data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-                        48,
-                      );
-                      const title2 = shortenString(
-                        data2.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-                        48,
-                      );
-                      const title3 = shortenString(
-                        data3.ItemsResult.Items[0].ItemInfo.Title.DisplayValue,
-                        48,
-                      );
+                      const title1 =
+                        req.body.titleLength1 === "breve"
+                          ? shortenString(
+                              data.ItemsResult.Items[0].ItemInfo.Title
+                                .DisplayValue,
+                              48,
+                            )
+                          : data.ItemsResult.Items[0].ItemInfo.Title
+                              .DisplayValue;
+                      const title2 =
+                        req.body.titleLength2 === "breve"
+                          ? shortenString(
+                              data2.ItemsResult.Items[0].ItemInfo.Title
+                                .DisplayValue,
+                              48,
+                            )
+                          : data2.ItemsResult.Items[0].ItemInfo.Title
+                              .DisplayValue;
+                      const title3 =
+                        req.body.titleLength3 === "breve"
+                          ? shortenString(
+                              data3.ItemsResult.Items[0].ItemInfo.Title
+                                .DisplayValue,
+                              48,
+                            )
+                          : data3.ItemsResult.Items[0].ItemInfo.Title
+                              .DisplayValue;
 
                       const postMsg = makePostMsg(req.body.postMsg1, data);
                       const postMsg2 = makePostMsg(req.body.postMsg2, data2);

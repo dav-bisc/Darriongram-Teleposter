@@ -1,6 +1,6 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "darriongram_teleposter",
+  "version": "0.0.2-beta",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
