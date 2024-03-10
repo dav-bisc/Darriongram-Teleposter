@@ -118,6 +118,15 @@ function makePostMsg(postMsg, data) {
   }
 }
 
+function isShortLink(link) {
+  if (link.length<32) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
@@ -243,7 +252,8 @@ app.post("/", async (req, res) => {
                   48,
                 )
               : data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue;
-          const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+            const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+          const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n ${linkToPost}`;
           bot
             .sendPhoto(process.env.CHAT_ID, img1, {
               parse_mode: "Markdown",
@@ -282,14 +292,15 @@ app.post("/", async (req, res) => {
                 const postMsg = makePostMsg(req.body.postMsg1, data);
                 const postMsg2 = makePostMsg(req.body.postMsg2, data2);
                 const imageURLs = [img1, img2];
-
+                const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+                const linkToPost2 = isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
                 const media = imageURLs.map((imageURL, index) => ({
                   type: "photo",
                   media: imageURL,
                   caption:
                     index === 0
                       ? `
-                                    *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**
+                                    *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n ${linkToPost}\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n ${linkToPost2}**
                                 `
                       : undefined,
                   parse_mode: "Markdown",
@@ -345,13 +356,16 @@ app.post("/", async (req, res) => {
 
                       const imageURLs = [img1, img2, img3];
 
+                      const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+                      const linkToPost2 = isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
+                      const linkToPost3 = isShortLink(req.body.link3) ? req.body.link3 : `**[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})`;
                       const media = imageURLs.map((imageURL, index) => ({
                         type: "photo",
                         media: imageURL,
                         caption:
                           index === 0
                             ? `
-                                        *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n **[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n **[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})**\n\n  *${emoji.get("bomb")} ${title3}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg3} ${emoji.get("rocket")}\n **[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})**
+                                        *${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n ${linkToPost}\n\n *${emoji.get("bomb")}** ${title2}*\n *${data2.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg2} ${emoji.get("rocket")}\n ${linkToPost2}**\n\n  *${emoji.get("bomb")} ${title3}*\n *${data3.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg3} ${emoji.get("rocket")}\n ${linkToPost3}**
                                     `
                             : undefined,
                         parse_mode: "Markdown",
