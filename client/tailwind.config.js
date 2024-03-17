@@ -28,7 +28,7 @@ module.exports = {
     },
     colors: {
       gray: colors.coolGray,
-      blue: colors.lightBlue,
+      blue: colors.sky,
       red: colors.rose,
       pink: colors.fuchsia,
     },
@@ -44,6 +44,9 @@ module.exports = {
       borderRadius: {
         "4xl": "2rem",
       },
+      backgroundImage: {
+        'money-boxes': "url('/img/bck.jpg')",
+      }
     },
   },
 };

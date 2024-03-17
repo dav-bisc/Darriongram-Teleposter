@@ -94,7 +94,7 @@ const Form = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="bg-cover bg-center bg-money-boxes justify-center content-center flex items-center">
       <div>
         <Toaster />
       </div>

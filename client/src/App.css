@@ -18,16 +18,6 @@ code {
     monospace;
 }
 
-.form-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 85vh;
-  background-image: url("../img/bck.jpg");
-  background-size: cover;
-  background-position: center;
-}
-
 .main-form {
   padding: 20px;
   margin: 10px;
