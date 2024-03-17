@@ -7,13 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Davide Biscardi",
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "amazon-paapi": "^1.0.7",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "node-emoji": "^2.1.3",
-    "node-telegram-bot-api": "^0.64.0"
+    "node-telegram-bot-api": "^0.64.0",
+    "follow-redirects": ">=1.15.6",
+    "tough-cookie": ">=4.1.3"
   }
 }

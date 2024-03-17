@@ -245,6 +245,7 @@ app.post("/", async (req, res) => {
         if (req.body.link2 === "") {
           const postMsg = makePostMsg(req.body.postMsg1, data);
           const img1 = extractImg(data, 1);
+          
           const title1 =
             req.body.titleLength1 === "breve"
               ? shortenString(
@@ -258,6 +259,16 @@ app.post("/", async (req, res) => {
             .sendPhoto(process.env.CHAT_ID, img1, {
               parse_mode: "Markdown",
               caption: `${caption}`,
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: "Apri nell'app",
+                      url: req.body.link1
+                    }
+                  ]
+                ]
+              }
             })
             .catch((error) => {
               handleError(error, res);
@@ -294,6 +305,21 @@ app.post("/", async (req, res) => {
                 const imageURLs = [img1, img2];
                 const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
                 const linkToPost2 = isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
+
+                const inlineKeyboard = {
+                  inline_keyboard: [
+                    [
+                      {
+                        text: "Apri primo link in app",
+                        url: req.body.link1
+                      },
+                      {
+                        text: "Apri secondo link in app",
+                        url: req.body.link2
+                      }
+                    ],
+                  ]
+                }
                 const media = imageURLs.map((imageURL, index) => ({
                   type: "photo",
                   media: imageURL,
@@ -304,12 +330,20 @@ app.post("/", async (req, res) => {
                                 `
                       : undefined,
                   parse_mode: "Markdown",
+                  
                 }));
-                bot
-                  .sendMediaGroup(process.env.CHAT_ID, media)
-                  .catch((error) => {
+                bot.sendMediaGroup(process.env.CHAT_ID, media)
+                .then(() => {
+                  bot.sendMessage(process.env.CHAT_ID, `${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")}`, {
+                    reply_markup: inlineKeyboard,
+                    parse_mode: "Markdown"
+                  }).catch((error) => {
                     handleError(error, res);
                   });
+                })
+                .catch((error) => {
+                  handleError(error, res);
+                });
                 return res.status(200).send({ msg: "ricevuto" });
               } else {
                 amazonPaapi
