@@ -1,6 +1,6 @@
 {
   "name": "darriongram_teleposter",
-  "version": "0.0.3-beta",
+  "version": "0.0.4-beta",
   "private": true,
   "license": "GPL-3.0-only",
   "dependencies": {

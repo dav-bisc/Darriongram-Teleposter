@@ -1,6 +1,6 @@
 {
   "name": "darrion-api",
-  "version": "0.0.3-beta",
+  "version": "0.0.4-beta",
   "description": "Server per REST API, scrive post in modo semi-automatizzato per telegram.",
   "main": "index.js",
   "scripts": {

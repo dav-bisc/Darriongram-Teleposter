@@ -253,22 +253,12 @@ app.post("/", async (req, res) => {
                   48,
                 )
               : data.ItemsResult.Items[0].ItemInfo.Title.DisplayValue;
-            const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+            const linkToPost = `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`; //isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
           const caption = `*${emoji.get("bomb")} ${title1}*\n *${data.ItemsResult.Items[0].Offers.Listings[0].Price.DisplayAmount}* ${postMsg} ${emoji.get("rocket")} \n ${linkToPost}`;
           bot
             .sendPhoto(process.env.CHAT_ID, img1, {
               parse_mode: "Markdown",
               caption: `${caption}`,
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    {
-                      text: "Apri nell'app",
-                      url: req.body.link1
-                    }
-                  ]
-                ]
-              }
             })
             .catch((error) => {
               handleError(error, res);
@@ -303,23 +293,9 @@ app.post("/", async (req, res) => {
                 const postMsg = makePostMsg(req.body.postMsg1, data);
                 const postMsg2 = makePostMsg(req.body.postMsg2, data2);
                 const imageURLs = [img1, img2];
-                const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
-                const linkToPost2 = isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
+                const linkToPost = `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;//isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+                const linkToPost2 = `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;//isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
 
-                const inlineKeyboard = {
-                  inline_keyboard: [
-                    [
-                      {
-                        text: "Apri primo link in app",
-                        url: req.body.link1
-                      },
-                      {
-                        text: "Apri secondo link in app",
-                        url: req.body.link2
-                      }
-                    ],
-                  ]
-                }
                 const media = imageURLs.map((imageURL, index) => ({
                   type: "photo",
                   media: imageURL,
@@ -333,14 +309,6 @@ app.post("/", async (req, res) => {
                   
                 }));
                 bot.sendMediaGroup(process.env.CHAT_ID, media)
-                .then(() => {
-                  bot.sendMessage(process.env.CHAT_ID, `${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")} ${emoji.get("arrow_down")}`, {
-                    reply_markup: inlineKeyboard,
-                    parse_mode: "Markdown"
-                  }).catch((error) => {
-                    handleError(error, res);
-                  });
-                })
                 .catch((error) => {
                   handleError(error, res);
                 });
@@ -390,9 +358,9 @@ app.post("/", async (req, res) => {
 
                       const imageURLs = [img1, img2, img3];
 
-                      const linkToPost = isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
-                      const linkToPost2 = isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
-                      const linkToPost3 = isShortLink(req.body.link3) ? req.body.link3 : `**[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})`;
+                      const linkToPost = `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;//isShortLink(req.body.link1) ? req.body.link1 : `**[LINK AMAZON](${data.ItemsResult.Items[0].DetailPageURL})`;
+                      const linkToPost2 = `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;//isShortLink(req.body.link2) ? req.body.link2 : `**[LINK AMAZON](${data2.ItemsResult.Items[0].DetailPageURL})`;
+                      const linkToPost3 = `**[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})`; //isShortLink(req.body.link3) ? req.body.link3 : `**[LINK AMAZON](${data3.ItemsResult.Items[0].DetailPageURL})`;
                       const media = imageURLs.map((imageURL, index) => ({
                         type: "photo",
                         media: imageURL,
