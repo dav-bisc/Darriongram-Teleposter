@@ -81,10 +81,10 @@ function checkProduct(prodData, prodNum) {
       result: false,
       msg: `Il link ${prodNum} non è valido, scegliere un link diverso.`,
     };
-  } else if (!prodData.ItemsResult.Items[0].Offers.Listings[0].Price.Savings) {
+  } else if (!prodData.ItemsResult.Items[0].Offers.Listings[0].Price.Savings && !prodData.ItemsResult.Items[0].Offers.Listings[0].SavingBasis) {
     return {
-      result: false,
-      msg: `Il link ${prodNum} contiene un prodotto non in offerta, scegliere un link diverso.`,
+      result: true,
+      //msg: `Il link ${prodNum} contiene un prodotto non in offerta, scegliere un link diverso.`,
     };
   } else {
     return { result: true };
@@ -100,22 +100,37 @@ function shortenString(s, N) {
 }
 
 function makePostMsg(postMsg, data) {
-  if (postMsg === "" || postMsg === null || typeof postMsg === "undefined") {
-    return `sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount}`;
-  } else {
-    if (postMsg[0].value === 1) {
-      return `, sconto di ${data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount}`;
-    } else if (postMsg[0].value === 2) {
-      const savingAmount =
-        data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.Amount;
-      const priceAmount =
-        data.ItemsResult.Items[0].Offers.Listings[0].Price.Amount;
-      const originalAmount = Number(priceAmount) + Number(savingAmount);
-      return `invece di ${originalAmount.toFixed(2)} € !`;
-    } else if (postMsg[0].value === 3) {
-      return " OFFERTISSIMA!";
+
+  if (!data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings && !data.ItemsResult.Items[0].Offers.Listings[0].SavingBasis) {
+    return " OFFERTISSIMA!";
+  }
+  else {
+    const discountValue = data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings ? 
+    data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.DisplayAmount : 
+    data.ItemsResult.Items[0].Offers.Listings[0].SavingBasis.DisplayAmount;
+  
+    const savingAmount = data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings ? 
+    data.ItemsResult.Items[0].Offers.Listings[0].Price.Savings.Amount : 
+    data.ItemsResult.Items[0].Offers.Listings[0].SavingBasis.Amount;
+  
+    if (postMsg === "" || postMsg === null || typeof postMsg === "undefined") {
+      return `sconto di ${discountValue}`;
+    } else {
+      if (postMsg[0].value === 1) {
+  
+        
+        return `, sconto di ${discountValue}`;
+      } else if (postMsg[0].value === 2) {
+        const priceAmount =
+          data.ItemsResult.Items[0].Offers.Listings[0].Price.Amount;
+        const originalAmount = Number(priceAmount) + Number(savingAmount);
+        return `invece di ${originalAmount.toFixed(2)} € !`;
+      } else if (postMsg[0].value === 3) {
+        return " OFFERTISSIMA!";
+      }
     }
   }
+ 
 }
 
 function isShortLink(link) {
